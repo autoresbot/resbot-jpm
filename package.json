@@ -1,0 +1,25 @@
+{
+  "name": "script-jpm",
+  "version": "1.1",
+  "description": "script jasa share",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "script",
+    "jpm"
+  ],
+  "author": "azhari creative",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^6.7.5",
+    "cli-color": "^2.0.4",
+    "mime-types": "^2.1.35",
+    "pino": "^9.3.2",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
