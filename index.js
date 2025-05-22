@@ -5,7 +5,7 @@ Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
 ╔══════════════════════════════════════════════╗
 ║                🛠️ INFORMASI SCRIPT           ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 1.2
+║ 📦 Version   : 1.3
 ║ 👨‍💻 Developer  : Azhari Creative              ║
 ║ 🌐 Website    : https://autoresbot.com       ║
 ║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
@@ -18,7 +18,7 @@ Script **Autoresbot** resmi menjadi **Open Source** dan dapat digunakan secara g
 
 const fs = require('fs');
 const path = require('path');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion  } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion  } = require('baileys');
 const { Boom } = require('@hapi/boom');
 const P = require('pino');
 const qrcode = require('qrcode-terminal');
@@ -90,6 +90,8 @@ async function handleIncomingMessages(sock, messageEvent) {
         if(type && type == 'append'){
             return false; // cegah bot kirim berulang
         }
+
+        // 120363401260391877@newsletter
         
         // Determine if the message is from a group
         const isGroup = Boolean(message.key?.participant);

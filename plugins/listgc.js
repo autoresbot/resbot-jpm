@@ -2,6 +2,7 @@ async function listgc(sock, sender, message) {
     try {
         // Ambil daftar grup yang sedang diikuti
         const groups = await sock.groupFetchAllParticipating();
+
         // Format data grup
         const groupList = Object.values(groups).map(group => ({
             id: group.id,

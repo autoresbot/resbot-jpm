@@ -5,7 +5,7 @@ Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
 ╔══════════════════════════════════════════════╗
 ║                🛠️ INFORMASI SCRIPT           ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 1.2
+║ 📦 Version   : 1.3
 ║ 👨‍💻 Developer  : Azhari Creative              ║
 ║ 🌐 Website    : https://autoresbot.com       ║
 ║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
@@ -24,6 +24,6 @@ global.jeda = 5000; // 5 detik jeda pengiriman untuk pushkontak atau broadcast
 
 global.name_script = 'Script Jpm';
 
-global.version = '1.2';
+global.version = '1.3';
 
 module.exports = { numberAllowed };
