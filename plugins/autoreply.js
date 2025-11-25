@@ -67,4 +67,5 @@ async function autoreply(sock, sender, messages, key, messageEvent) {
   }, 60 * 1000); // Jalankan setiap 1 menit (looping utama)
 }
 
-module.exports = autoreply;
+export default autoreply;
+

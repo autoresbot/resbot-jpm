@@ -1,16 +1,25 @@
 async function menu(sock, sender, message) {
-  const templates = `*✯ ᴍᴇɴᴜ ꜱᴄ ᴊᴘᴍ ✯*
 
-➽ ʟɪꜱᴛɢᴄ
-➽ ᴀᴜᴛᴏᴊᴘᴍ
-➽ ᴀᴜᴛᴏʀᴇᴘʟʏ
-➽ ᴊᴘᴍ
-➽ ᴊᴘᴍᴛᴀɢ
-➽ ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ
+  const templates = `
+╭❰  *✯ RESBOT JPM ✯*  ❱
+│
+│ Status : ACTIVE
+│ User   : ${sender.split('@')[0]}
+╰────────────❱
 
-ᴄᴏᴘʏʀɪɢʜᴛ © autoresbot.com
-`;
+┌─ *COMMANDS*
+│
+│ ➤  ʟɪꜱᴛɢᴄ
+│ ➤  ᴀᴜᴛᴏᴊᴘᴍ
+│ ➤  ᴀᴜᴛᴏʀᴇᴘʟʏ
+│ ➤  ᴊᴘᴍ
+│ ➤  ᴊᴘᴍᴛᴀɢ
+│ ➤  ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ
+└───────────
+
+© autoresbot.com`;
+
   await sock.sendMessage(sender, { text: templates });
 }
 
-module.exports = menu;
+export default menu;

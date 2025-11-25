@@ -1,64 +1,97 @@
-const clc = require("cli-color");
+import clc from 'cli-color';
+
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function pushkontak(sock, sender, message, key) {
-  const parts = message.split(" ");
-  const templates = `*✯ ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ ✯*
+    try {
+        const parts = message.split(" ");
 
-*ᴄᴀʀᴀ ᴘᴇɴɢɢᴜɴᴀᴀɴ*
-➽ ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ ɪᴅɢʀᴜʙ ᴛᴇxᴛ
+        const templates =
+`PUSH KONTAK
 
-ᴄᴏɴᴛᴏʜ: ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ 123456789@g.us ᴘᴇꜱᴀɴ`;
+Cara Penggunaan:
+pushkontak <ID_Grup> <pesan>
 
-  if (parts.length < 3) {
-    return await sock.sendMessage(sender, { text: templates });
-  }
+Contoh:
+pushkontak 123456789@g.us Informasi penting...`;
 
-  const command = parts[0]; // Kata pertama
-  const idgrub = parts[1]; // Kata kedua
-  const text = parts.slice(2).join(" "); // Gabungkan sisa pesan
+        // Cek minimal argumen
+        if (parts.length < 3) {
+            return await sock.sendMessage(sender, { text: templates });
+        }
 
-  if (!message.includes("@g.us")) {
-    return await sock.sendMessage(sender, { text: templates });
-  }
+        const idgrub = parts[1];
+        const text = parts.slice(2).join(" ");
 
-  if (text.length == 0) {
-    return await sock.sendMessage(sender, { react: { text: "🚫", key } });
-  }
+        // Validasi ID grup
+        if (!idgrub.includes("@g.us")) {
+            return await sock.sendMessage(sender, { text: templates });
+        }
 
-  await sock.sendMessage(sender, { react: { text: "⏰", key } });
+        // Validasi isi pesan
+        if (!text || text.length === 0) {
+            return await sock.sendMessage(sender, {
+                text: "Gagal: pesan tidak boleh kosong."
+            });
+        }
 
-  const allParticipant = await getGroupParticipants(sock, idgrub);
+        await sock.sendMessage(sender, {
+            text: "Permintaan diproses, sedang mengambil daftar kontak..."
+        });
 
-  if (!allParticipant) {
-    return await sock.sendMessage(sender, { react: { text: "🚫", key } });
-  }
+        const allParticipant = await getGroupParticipants(sock, idgrub);
 
-  const totalMember = allParticipant.length;
+        if (!allParticipant || allParticipant.length === 0) {
+            return await sock.sendMessage(sender, {
+                text: "Gagal: tidak dapat membaca peserta grup. Pastikan bot masih berada dalam grup."
+            });
+        }
 
-  let nomor = 1;
-  for (const participant of allParticipant) {
-    console.log(
-      clc.green(`[${nomor}] Mengirim Pesan ke nomor : ${participant.id}`)
-    );
-    await sock.sendMessage(participant.id, { text: text });
-    await sleep(global.jeda);
-    nomor++;
-  }
-  const pushcontact_finish = `*✅ Proses Pushkontak ke ${totalMember} Nomor telah Selesai*`;
-  return await sock.sendMessage(sender, { text: pushcontact_finish });
+        const totalMember = allParticipant.length;
+        let nomor = 1;
+
+        for (const participant of allParticipant) {
+            try {
+                console.log(
+                    clc.green(`[${nomor}/${totalMember}] Mengirim pesan ke: ${participant.id}`)
+                );
+
+                // Uncomment jika ingin pesan benar-benar dikirim:
+                await sock.sendMessage(participant.id, { text });
+
+                await sleep(global.jeda || 3000);
+            } catch (sendError) {
+                console.error(
+                    clc.red(`[ERROR] Gagal mengirim ke ${participant.id}:`),
+                    sendError
+                );
+            }
+            nomor++;
+        }
+
+        return await sock.sendMessage(sender, {
+            text: `Proses push kontak selesai.\nTotal target: ${totalMember} nomor.`
+        });
+
+    } catch (mainError) {
+        console.error(clc.red("[FATAL] Terjadi kesalahan fatal di fungsi pushkontak:"), mainError);
+
+        return await sock.sendMessage(sender, {
+            text: "Terjadi kesalahan tidak terduga saat menjalankan perintah. Silakan coba kembali."
+        });
+    }
 }
 
 async function getGroupParticipants(sock, groupId) {
-  try {
-    const metadata = await sock.groupMetadata(groupId);
-    const participants = metadata.participants;
-    return participants;
-  } catch (error) {
-    return false;
-  }
+    try {
+        const metadata = await sock.groupMetadata(groupId);
+        return metadata.participants;
+    } catch (error) {
+        console.error(clc.red(`[ERROR] Gagal mengambil metadata grup ${groupId}:`), error);
+        return false;
+    }
 }
 
-module.exports = pushkontak;
+export default pushkontak;

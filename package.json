@@ -1,7 +1,8 @@
 {
   "name": "script-jpm",
-  "version": "1.4",
+  "version": "2.0",
   "description": "script jpm",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -15,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "baileys": "^6.7.18",
+    "baileys": "^7.0.0-rc.9",
     "cli-color": "^2.0.4",
     "mime-types": "^2.1.35",
     "pino": "^9.3.2",

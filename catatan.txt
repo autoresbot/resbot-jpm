@@ -1,0 +1,7 @@
+npm uninstall baileys
+
+"type": "module",
+
+ubah semua require
+
+ubah dirname

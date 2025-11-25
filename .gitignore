@@ -3,3 +3,4 @@ sessions/
 *.log
 *.env
 .DS_Store
+catatan.txt

@@ -1,15 +1,15 @@
-const clc = require("cli-color");
-const fs = require("fs");
-const path = require("path");
+import clc from "cli-color";
+import fs from "fs";
+import path from "path";
+import { isImageMessage, downloadAndSaveMedia, readWhitelist } from "../lib/utils.js";
 
-function sleep(ms) {
+
+export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const {
-  saveAutoJPMStatus,
-  readAutoJPMStatus,
-} = require("../lib/autojpmStatus");
+import { saveAutoJPMStatus, readAutoJPMStatus } from "../lib/autojpmStatus.js";
+
 
 global.autojpmRunning = false;
 
@@ -28,11 +28,7 @@ async function getAllGroups(sock) {
 }
 
 async function autojpm(sock, sender, messages, key, messageEvent) {
-  const {
-    isImageMessage,
-    downloadAndSaveMedia,
-    readWhitelist,
-  } = require("../lib/utils");
+
 
   const parts = messages.trim().split(" ");
   const command = parts[0]?.toLowerCase();
@@ -162,4 +158,4 @@ async function autojpm(sock, sender, messages, key, messageEvent) {
   });
 }
 
-module.exports = autojpm;
+export default autojpm;

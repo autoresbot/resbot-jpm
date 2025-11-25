@@ -5,7 +5,7 @@ Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
 ╔══════════════════════════════════════════════╗
 ║                🛠️ INFORMASI SCRIPT           ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 1.4
+║ 📦 Version   : 2.0
 ║ 👨‍💻 Developer  : Azhari Creative              ║
 ║ 🌐 Website    : https://autoresbot.com       ║
 ║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
@@ -16,39 +16,50 @@ Script **Autoresbot** resmi menjadi **Open Source** dan dapat digunakan secara g
 🔗 https://autoresbot.com
 */
 
-const fs = require("fs");
-const path = require("path");
-const {
-  default: makeWASocket,
+console.log('Start App ..')
+
+
+import fs from "fs";
+import path from "path";
+import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
-} = require("baileys");
-const { Boom } = require("@hapi/boom");
-const P = require("pino");
-const qrcode = require("qrcode-terminal");
-const readline = require("readline");
-const clc = require("cli-color");
+} from "baileys";
+import { Boom } from "@hapi/boom";
+import P from "pino";
+import qrcode from "qrcode-terminal";
+import readline from "readline";
+import clc from "cli-color";
 
-const {
+
+import {
   deleteFolderRecursive,
   ChangeStatus,
   getStatus,
   handleCommand,
   displayTime,
-  isImageMessage,
-  downloadAndSaveMedia,
-} = require("./lib/utils");
+  logWithTime
+} from "./lib/utils.js";
+
+
+import resumeAutoJPM from "./lib/resumeAutoJPM.js";
+
+// Pengganti __dirname di ESM
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const basePath = __dirname;
 const status = getStatus(`${basePath}/sessions/`);
 
-const resumeAutoJPM = require("./lib/resumeAutoJPM");
 
 async function connectToWhatsApp(number = null) {
   try {
     const { state, saveCreds } = await useMultiFileAuthState("sessions");
     const { version } = await fetchLatestBaileysVersion();
 
+   
     const sock = makeWASocket({
       version,
       auth: state,
@@ -69,7 +80,7 @@ async function connectToWhatsApp(number = null) {
     );
     sock.ev.on("creds.update", saveCreds);
   } catch (error) {
-    console.error("Failed to connect to WhatsApp:", error);
+    logWithTime("Failed to connect to WhatsApp", "red");
   }
 }
 
@@ -97,13 +108,13 @@ async function handleConnectionUpdate(sock, update, number) {
   if (connection === "close") {
     const shouldReconnect =
       lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-    console.log(clc.red.bold("Connection Closed"));
+    logWithTime("Connection Closed", "red");
     ChangeStatus(`${basePath}/sessions/`, "closed");
     if (shouldReconnect) {
       connectToWhatsApp();
     }
   } else if (connection === "open") {
-    console.log(clc.green("Connection Success"));
+    logWithTime("Connection Success", "green");
     ChangeStatus(`${basePath}/sessions/`, "connected");
     // Setelah sock siap:
 
@@ -122,12 +133,12 @@ async function handleIncomingMessages(sock, messageEvent) {
 
     // Determine if the message is from a group
     const isGroup = Boolean(message.key?.participant);
-    const sender = message.key?.remoteJid;
+    const sender = message.key?.remoteJidAlt || message.key?.remoteJid;
     const key = message?.key;
     // Determine the sender number based on whether the message is from a group or not
     const senderNumber = (() => {
       if (isGroup) {
-        const participant = message.key?.participant;
+        const participant = message.key?.participantAlt || message.key?.participant;
         return participant ? participant.split("@")[0] : "unknown";
       } else {
         return sender ? sender.split("@")[0] : "unknown";
@@ -163,9 +174,8 @@ async function handleIncomingMessages(sock, messageEvent) {
 }
 
 let pairingMethod = "";
-
 if (status && status == "connected") {
-  console.log(clc.green("connecting ..."));
+  logWithTime("Connecting ...", "green");
   //deleteFolderRecursive(basePath, 'tmp');
   connectToWhatsApp();
 } else {
@@ -199,9 +209,7 @@ if (status && status == "connected") {
         return;
       }
     } else {
-      console.log(
-        clc.red.bold('Metode koneksi tidak valid. Pilih "qr" atau "pairing".')
-      );
+      logWithTime('Metode koneksi tidak valid. Pilih "qr" atau "pairing".');
       rl.close();
       return;
     }

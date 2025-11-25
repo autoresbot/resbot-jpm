@@ -1,6 +1,8 @@
-const clc = require('cli-color');
-const fs = require('fs');
-const path = require('path');
+import clc from 'cli-color';
+import fs from 'fs';
+import path from 'path';
+import { isImageMessage, downloadAndSaveMedia, readWhitelist } from '../lib/utils.js';
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -23,8 +25,6 @@ async function getAllGroups(sock) {
 async function jpmtag(sock, sender, messages, key, messageEvent) {
     const message = messageEvent.messages?.[0];
     let imagePath = null;
-
-    const { isImageMessage, downloadAndSaveMedia, readWhitelist } = require('../lib/utils');
 
     // Cek apakah ada gambar
     if (isImageMessage(messageEvent)) {
@@ -101,4 +101,4 @@ async function jpmtag(sock, sender, messages, key, messageEvent) {
     });
 }
 
-module.exports = jpmtag;
+export default jpmtag;
