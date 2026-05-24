@@ -16,15 +16,15 @@ Script **Autoresbot** resmi menjadi **Open Source** dan dapat digunakan secara g
 🔗 https://autoresbot.com
 */
 
-const numberAllowed = ["6285246154386"]; // Nomor yang diizinkan untuk chat ke bot, tambahkan kalau diperlukan
+const numberAllowed = ['6285246154386']; // Nomor yang diizinkan untuk chat ke bot, tambahkan kalau diperlukan
 
-global.prefix = [".", "#"]; // Daftar prefix
+global.prefix = ['.', '#']; // Daftar prefix
 
 global.jeda = 15000; // 15 detik jeda pengiriman untuk pushkontak atau broadcast
 
-global.name_script = "Script Resbot Jpm";
+global.name_script = 'Script Resbot Jpm';
 
-global.version = "2.0";
+global.version = '2.1';
 
 global.autojpm = {
   hidetag: false, // jadikan true kalau mau hidetag, atau false kalau tidak

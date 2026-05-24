@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "baileys": "^7.0.0-rc.9",
+    "baileys": "^7.0.0-rc13",
     "cli-color": "^2.0.4",
     "mime-types": "^2.1.35",
     "pino": "^9.3.2",
