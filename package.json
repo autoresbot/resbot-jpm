@@ -1,6 +1,6 @@
 {
   "name": "script-jpm",
-  "version": "2.0",
+  "version": "2.1",
   "description": "script jpm",
   "type": "module",
   "main": "index.js",

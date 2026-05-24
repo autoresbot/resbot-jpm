@@ -5,7 +5,7 @@ Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
 ╔══════════════════════════════════════════════╗
 ║                🛠️ INFORMASI SCRIPT           ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 2.0
+║ 📦 Version   : 2.1
 ║ 👨‍💻 Developer  : Azhari Creative              ║
 ║ 🌐 Website    : https://autoresbot.com       ║
 ║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
