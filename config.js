@@ -53,6 +53,20 @@ const config = {
   //
   //    Ganti ke 'production' kalau sudah siap dipakai sungguhan.
   mode: 'production',
+
+  // 8) LOGIN OTOMATIS (untuk panel Pterodactyl / VPS)
+  //    Sebagian panel tidak bisa menerima ketikan di konsol, jadi bot
+  //    tidak bisa bertanya "qr atau pairing". Isi di sini supaya langsung
+  //    jalan tanpa ditanya.
+  //
+  //    metode : '' (kosong) = ditanya lewat terminal seperti biasa
+  //             'qr'        = langsung tampilkan QR code
+  //             'pairing'   = langsung tampilkan kode 8 digit
+  //    nomor  : wajib diisi kalau metode 'pairing'
+  login: {
+    metode: '',
+    nomor: '',
+  },
 };
 
 /*

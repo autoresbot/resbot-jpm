@@ -11,6 +11,21 @@ MENJALANKAN
   Mau ganti nomor bot? hapus file itu, lalu npm start lagi.
 
 
+DI PANEL PTERODACTYL / VPS (TIDAK BISA MENGETIK DI KONSOL)
+---------------------------------------------------------
+  Kalau konsol panel tidak menerima ketikan, bot tidak bisa ditanya
+  "qr atau pairing". Isi bagian login di config.js:
+
+      login: {
+        metode: 'pairing',       // atau 'qr'
+        nomor: '628xxxxxxxxxx',  // wajib kalau metode 'pairing'
+      },
+
+  Jalankan bot -> kode pairing / QR langsung muncul di konsol,
+  tanpa perlu mengetik apa pun.
+  Setelah berhasil login, boleh dikosongkan lagi (metode: '').
+
+
 BOT TIDAK MEMBALAS? -> TAMBAH NOMOR OWNER
 -----------------------------------------
   Bot hanya menuruti nomor yang terdaftar sebagai owner.

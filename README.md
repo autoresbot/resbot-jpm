@@ -96,7 +96,22 @@ Restart bot, lalu ketik `halo apa kabar`.
 ## Hosting 24 Jam (Panel Pterodactyl)
 
 Script ini bisa dijalankan di **panel Pterodactyl**, jadi bot tetap online 24 jam
-tanpa perlu menyalakan komputer sendiri. Sewa panelnya di:
+tanpa perlu menyalakan komputer sendiri.
+
+Kalau konsol panel tidak bisa menerima ketikan, isi bagian `login` di `config.js`
+supaya bot tidak perlu bertanya:
+
+```js
+login: {
+  metode: 'pairing',      // atau 'qr'
+  nomor: '628xxxxxxxxxx', // wajib kalau metode 'pairing'
+},
+```
+
+Kode pairing / QR akan langsung muncul di konsol begitu bot dijalankan.
+Setelah berhasil login, bagian ini boleh dikosongkan lagi.
+
+Sewa panelnya di:
 
 - 🌐 [autoresbot.com](https://autoresbot.com/)
 - 🌐 [panelbot.id](https://panelbot.id/)
