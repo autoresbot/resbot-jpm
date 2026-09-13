@@ -1,34 +1,81 @@
 /*
-⚠️ PERINGATAN:
-Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
-
 ╔══════════════════════════════════════════════╗
-║                🛠️ INFORMASI SCRIPT           ║
+║              PENGATURAN BOT                  ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 2.1
-║ 👨‍💻 Developer  : Azhari Creative              ║
-║ 🌐 Website    : https://autoresbot.com       ║
-║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
+║ Cukup ubah angka / teks di bawah ini.        ║
+║ Jangan hapus tanda koma ( , ) dan kutip ( ' )║
 ╚══════════════════════════════════════════════╝
 
-📌 Mulai 11 April 2025,
-Script **Autoresbot** resmi menjadi **Open Source** dan dapat digunakan secara gratis:
-🔗 https://autoresbot.com
+Script Resbot JPM - https://autoresbot.com
+Gratis & open source. DILARANG DIPERJUALBELIKAN.
 */
 
-const numberAllowed = ['6285246154386']; // Nomor yang diizinkan untuk chat ke bot, tambahkan kalau diperlukan
+const config = {
+  // 1) Nomor yang boleh menyuruh bot.  <-- WAJIB DIGANTI
+  //    Pakai kode negara, tanpa tanda + dan tanpa spasi.
+  //    Contoh benar : ['6281234567890']
+  //    Contoh salah : ['+62 812-3456-7890']  (ada +, spasi, dan strip)
+  //    Boleh lebih dari satu: ['628111', '628222']
+  nomorOwner: ['628xxxxxxxxxx'],
 
-global.prefix = ['.', '#']; // Daftar prefix
+  // 2) Awalan perintah. Contoh: .menu  atau  #menu
+  //    Perintah tanpa awalan (menu) juga tetap bisa.
+  prefix: ['.', '#'],
 
-global.jeda = 15000; // 15 detik jeda pengiriman untuk pushkontak atau broadcast
+  // 3) Identitas bot (muncul di menu & ping)
+  namaBot: 'Script Resbot Jpm',
+  versi: '2.3.0',
 
-global.name_script = 'Script Resbot Jpm';
+  // 4) Jeda dalam DETIK antar pengiriman ke tiap grup / kontak.
+  //    Makin besar makin aman dari banned. Jangan di bawah 5.
+  jedaKirim: 15,
 
-global.version = '2.1';
+  // 5) Pengaturan AUTOJPM (broadcast yang mengulang terus)
+  autojpm: {
+    tagSemua: false, // true = tag semua anggota grup, false = tidak
+    jedaPutaran: 10, // jeda DETIK sebelum mengulang putaran berikutnya
+  },
 
-global.autojpm = {
-  hidetag: false, // jadikan true kalau mau hidetag, atau false kalau tidak
-  jedaPutaran: 10000, // 10000 = 10 detik
+  // 6) Lokasi penyimpanan sesi login WhatsApp.
+  //    Hapus file ini kalau mau login ulang dengan nomor lain.
+  fileSesi: 'sessions/whatsapp.sqlite',
+
+  // 7) MODE BOT
+  //
+  //    'production'  = NORMAL. Pesan benar-benar dikirim.
+  //
+  //    'development' = UJI COBA. Pesan dari jpm, jpmtag, autojpm,
+  //                    pushkontak, dan autoreply TIDAK dikirim ke siapa pun,
+  //                    hanya ditampilkan di terminal. Bot tetap membalas
+  //                    perintah Anda seperti biasa, jadi alurnya bisa dites
+  //                    tanpa risiko spam atau banned.
+  //                    Jeda antar pengiriman juga dipercepat jadi 1 detik.
+  //
+  //    Ganti ke 'production' kalau sudah siap dipakai sungguhan.
+  mode: 'production',
 };
 
-export { numberAllowed };
+/*
+──────────────────────────────────────────────────────────────
+ JANGAN DIUBAH — bagian di bawah ini bukan pengaturan.
+
+ Kalau ada file "local.config.js" di folder yang sama, isinya
+ akan menimpa pengaturan di atas. File itu tidak ikut ke Git,
+ jadi aman dipakai untuk pengaturan pribadi di komputer sendiri.
+──────────────────────────────────────────────────────────────
+*/
+import fs from 'fs';
+
+const fileLokal = new URL('./local.config.js', import.meta.url);
+
+if (fs.existsSync(fileLokal)) {
+  const lokal = (await import(fileLokal.href)).default ?? {};
+  const autojpmBawaan = { ...config.autojpm };
+
+  Object.assign(config, lokal);
+  config.autojpm = { ...autojpmBawaan, ...(lokal.autojpm ?? {}) };
+
+  console.log('Pengaturan pribadi dari local.config.js dipakai.');
+}
+
+export default config;

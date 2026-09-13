@@ -1,71 +1,83 @@
-let status = false;
+import { sendMessage, jedaKirim } from '../lib/broadcast.js';
+import { log } from '../lib/logger.js';
+import { siapKirim } from '../lib/state.js';
+import { readWhitelist } from '../lib/whitelist.js';
 
-// Fungsi untuk reset counter per grup
-function resetChatCounter(sender) {
-  if (global.chatCounter[sender]) {
-    global.chatCounter[sender].total = 0;
-    //console.log('✅ Total chat untuk grup ini telah direset');
-  } else {
-    //console.log('⚠️ Grup belum memiliki data counter');
-  }
+const JEDA_PUTARAN = 60 * 1000; // periksa grup aktif setiap 1 menit
+
+const PANDUAN = `*ᴄᴀʀᴀ ᴘᴇɴɢɢᴜɴᴀᴀɴ*
+➽ autoreply <pesan>   -> mulai balas otomatis
+➽ autoreply stop      -> hentikan
+
+Contoh: autoreply Halo, ada yang bisa dibantu?`;
+
+// timer juga dipakai sebagai penanda: null = tidak sedang berjalan
+let timer = null;
+
+function hentikan() {
+  clearInterval(timer);
+  timer = null;
 }
 
-// Fungsi utama
-async function autoreply(sock, sender, messages, key, messageEvent) {
-  // Jika sudah berjalan, hentikan duplikasi interval
-  if (status) {
-    await sock.sendMessage(sender, {
-      text: "✅ Autoreply sudah berjalan sebelumnya",
-    });
-    return;
+/** Sedang berjalan? (dipakai perintah resetdata) */
+export function isAutoreplyRunning() {
+  return Boolean(timer);
+}
+
+/** Hentikan dari luar, mis. oleh perintah resetdata */
+export function stopAutoreply() {
+  if (!timer) return false;
+  hentikan();
+  return true;
+}
+
+/**
+ * Balas otomatis ke grup yang baru saja ada chatnya.
+ * global.chatCounter diisi oleh lib/handler.js setiap ada pesan masuk.
+ */
+export default async function autoreply({ client, body, reply, react }) {
+  if (body.toLowerCase() === 'stop') {
+    if (!timer) return reply('❌ Autoreply tidak sedang berjalan.');
+    hentikan();
+    log('Autoreply dihentikan oleh pengguna.', 'yellow');
+    return reply('🛑 Autoreply telah dihentikan.');
   }
 
-  // Validasi isi pesan
-  const parts = messages.trim().split(" ");
-  if (parts.length < 2) {
-    return sock.sendMessage(sender, {
-      text: `*ᴄᴀʀᴀ ᴘᴇɴɢɢᴜɴᴀᴀɴ*\n➽ ᴀᴜᴛᴏʀᴇᴘʟʏ ᴛᴇxᴛ\n\nᴄᴏɴᴛᴏʜ: ᴀᴜᴛᴏʀᴇᴘʟʏ ᴘᴇꜱᴀɴ`,
-    });
+  if (timer) {
+    return reply('⚠️ Autoreply sudah berjalan. Ketik *autoreply stop* untuk menghentikan.');
   }
-  status = true;
 
-  // Interval kirim pesan ke grup aktif setiap 10 detik (misal)
-  const interval = setInterval(async () => {
-    const activeGroups = Object.keys(global.chatCounter || {});
+  if (!body) return reply(PANDUAN);
 
-    if (activeGroups.length === 0) {
-      console.log("⛔ Tidak ada grup aktif. Menunggu aktivitas...");
-      return;
-    }
+  await react('⏰');
+  await reply('✅ Autoreply diaktifkan.');
 
-    const text = parts.slice(1).join(" ");
-    if (!text) {
-      return sock.sendMessage(sender, { react: { text: "🚫", key } });
-    }
+  timer = setInterval(async () => {
+    if (!siapKirim()) return; // koneksi sedang putus, tunggu sampai tersambung lagi
 
-    await sock.sendMessage(sender, { react: { text: "⏰", key } });
+    // Grup di whitelist dilewati, sama seperti jpm / autojpm
+    const whitelist = readWhitelist();
+    const grupAktif = Object.keys(global.chatCounter ?? {}).filter(
+      (id) =>
+        id.endsWith('@g.us') &&
+        global.chatCounter[id].total > 0 &&
+        !whitelist.includes(id),
+    );
 
-    for (const groupId of activeGroups) {
+    if (!grupAktif.length) return;
+
+    for (const groupId of grupAktif) {
+      if (!timer) break; // dihentikan di tengah putaran
+
       try {
-        if (global.chatCounter[groupId]?.total < 1) continue;
-
-        await sock.sendMessage(groupId, {
-          text: text,
-        });
-
-        console.log(`✅ Terkirim ke ${groupId}`);
-        resetChatCounter(groupId);
-
-        // Tunggu antar kiriman
-        await new Promise((resolve) =>
-          setTimeout(resolve, global.jeda || 10000)
-        ); // default 10s
-      } catch (err) {
-        console.error(`❌ Gagal kirim ke ${groupId}:`, err.message);
+        await sendMessage(client, groupId, { type: 'text', text: body });
+        global.chatCounter[groupId].total = 0;
+        log(`AUTOREPLY Terkirim ke ${groupId}`);
+      } catch (error) {
+        log(`Gagal kirim autoreply ke ${groupId}: ${error.message}`, 'red');
       }
+
+      await jedaKirim();
     }
-  }, 60 * 1000); // Jalankan setiap 1 menit (looping utama)
+  }, JEDA_PUTARAN);
 }
-
-export default autoreply;
-

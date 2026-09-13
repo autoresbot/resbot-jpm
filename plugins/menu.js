@@ -1,25 +1,32 @@
-async function menu(sock, sender, message) {
+import config from '../config.js';
 
-  const templates = `
-╭❰  *✯ RESBOT JPM ✯*  ❱
+const perintah = [
+  'listgc',
+  'jpm',
+  'jpmtag',
+  'autojpm',
+  'autoreply',
+  'pushkontak',
+  'whitelist',
+  'addwhitelist',
+  'delwhitelist',
+  'ping',
+  'resetdata',
+];
+
+export default async function menu({ reply, senderNumber }) {
+  const daftar = perintah.map((nama) => `│ ➤  ${nama}`).join('\n');
+
+  await reply(`╭❰  *${config.namaBot}*  ❱
 │
 │ Status : ACTIVE
-│ User   : ${sender.split('@')[0]}
+│ User   : ${senderNumber}
 ╰────────────❱
 
 ┌─ *COMMANDS*
 │
-│ ➤  ʟɪꜱᴛɢᴄ
-│ ➤  ᴀᴜᴛᴏᴊᴘᴍ
-│ ➤  ᴀᴜᴛᴏʀᴇᴘʟʏ
-│ ➤  ᴊᴘᴍ
-│ ➤  ᴊᴘᴍᴛᴀɢ
-│ ➤  ᴘᴜꜱʜᴋᴏɴᴛᴀᴋ
+${daftar}
 └───────────
 
-© autoresbot.com`;
-
-  await sock.sendMessage(sender, { text: templates });
+© autoresbot.com`);
 }
-
-export default menu;

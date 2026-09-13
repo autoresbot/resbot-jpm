@@ -1,6 +1,10 @@
 node_modules/
 sessions/
+tmp/
 *.log
 *.env
 .DS_Store
 catatan.txt
+local.config.js
+data/autojpm-state.json
+data/autojpm-image.jpg

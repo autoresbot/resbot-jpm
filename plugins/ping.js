@@ -1,15 +1,10 @@
-async function ping(sock, sender, message, key, messageEvent) {
+import config from '../config.js';
 
-    const msg = `
-╭─❰  *${global.name_script}*  ❱
+export default async function ping({ reply }) {
+  await reply(`╭─❰  *${config.namaBot}*  ❱
 │
-│ Version : *${global.version}*
+│ Version : *${config.versi}*
 │ Status  : *Aktif*
-│ Time    : ${new Date().toLocaleTimeString("id-ID")}
-╰──────────❱
-`;
-
-    await sock.sendMessage(sender, { text: msg });
+│ Time    : ${new Date().toLocaleTimeString('id-ID')}
+╰──────────❱`);
 }
-
-export default ping;

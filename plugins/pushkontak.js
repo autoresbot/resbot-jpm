@@ -1,97 +1,55 @@
-import clc from 'cli-color';
+import { getGroupParticipants } from '../lib/groups.js';
+import { sendMessage, jedaKirim } from '../lib/broadcast.js';
+import { log } from '../lib/logger.js';
+import { siapKirim } from '../lib/state.js';
+import { catatanMode } from '../lib/mode.js';
 
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function pushkontak(sock, sender, message, key) {
-    try {
-        const parts = message.split(" ");
-
-        const templates =
-`PUSH KONTAK
+const PANDUAN = `*PUSH KONTAK*
 
 Cara Penggunaan:
 pushkontak <ID_Grup> <pesan>
 
 Contoh:
-pushkontak 123456789@g.us Informasi penting...`;
+pushkontak 123456789@g.us Informasi penting...
 
-        // Cek minimal argumen
-        if (parts.length < 3) {
-            return await sock.sendMessage(sender, { text: templates });
-        }
+ID grup bisa dilihat dengan perintah *listgc*`;
 
-        const idgrub = parts[1];
-        const text = parts.slice(2).join(" ");
+export default async function pushkontak({ client, args, reply }) {
+  const [idGrup, ...sisa] = args;
+  const text = sisa.join(' ').trim();
 
-        // Validasi ID grup
-        if (!idgrub.includes("@g.us")) {
-            return await sock.sendMessage(sender, { text: templates });
-        }
+  if (!idGrup?.includes('@g.us') || !text) return reply(PANDUAN);
 
-        // Validasi isi pesan
-        if (!text || text.length === 0) {
-            return await sock.sendMessage(sender, {
-                text: "Gagal: pesan tidak boleh kosong."
-            });
-        }
+  await reply('Permintaan diproses, sedang mengambil daftar kontak...');
 
-        await sock.sendMessage(sender, {
-            text: "Permintaan diproses, sedang mengambil daftar kontak..."
-        });
+  const anggota = await getGroupParticipants(client, idGrup);
+  if (!anggota.length) {
+    return reply('Gagal: tidak dapat membaca anggota grup. Pastikan bot masih berada di grup itu.');
+  }
 
-        const allParticipant = await getGroupParticipants(sock, idgrub);
+  let terkirim = 0;
+  let nomor = 1;
 
-        if (!allParticipant || allParticipant.length === 0) {
-            return await sock.sendMessage(sender, {
-                text: "Gagal: tidak dapat membaca peserta grup. Pastikan bot masih berada dalam grup."
-            });
-        }
-
-        const totalMember = allParticipant.length;
-        let nomor = 1;
-
-        for (const participant of allParticipant) {
-            try {
-                console.log(
-                    clc.green(`[${nomor}/${totalMember}] Mengirim pesan ke: ${participant.id}`)
-                );
-
-                // Uncomment jika ingin pesan benar-benar dikirim:
-                await sock.sendMessage(participant.id, { text });
-
-                await sleep(global.jeda || 3000);
-            } catch (sendError) {
-                console.error(
-                    clc.red(`[ERROR] Gagal mengirim ke ${participant.id}:`),
-                    sendError
-                );
-            }
-            nomor++;
-        }
-
-        return await sock.sendMessage(sender, {
-            text: `Proses push kontak selesai.\nTotal target: ${totalMember} nomor.`
-        });
-
-    } catch (mainError) {
-        console.error(clc.red("[FATAL] Terjadi kesalahan fatal di fungsi pushkontak:"), mainError);
-
-        return await sock.sendMessage(sender, {
-            text: "Terjadi kesalahan tidak terduga saat menjalankan perintah. Silakan coba kembali."
-        });
+  for (const peserta of anggota) {
+    if (!siapKirim()) {
+      log('Koneksi terputus - push kontak dihentikan.', 'red');
+      break;
     }
-}
 
-async function getGroupParticipants(sock, groupId) {
+    // Pakai nomor telepon kalau tersedia, baru jatuh ke JID grup (@lid)
+    const tujuan = peserta.phoneNumber ?? peserta.jid;
+    log(`PUSHKONTAK [${nomor}/${anggota.length}] Mengirim ke: ${tujuan}`);
+
     try {
-        const metadata = await sock.groupMetadata(groupId);
-        return metadata.participants;
+      await sendMessage(client, tujuan, { type: 'text', text });
+      terkirim += 1;
     } catch (error) {
-        console.error(clc.red(`[ERROR] Gagal mengambil metadata grup ${groupId}:`), error);
-        return false;
+      log(`Gagal mengirim ke ${tujuan}: ${error.message}`, 'red');
     }
-}
 
-export default pushkontak;
+    await jedaKirim();
+    nomor += 1;
+  }
+
+  await reply(`Proses push kontak selesai.\nBerhasil: ${terkirim} dari ${anggota.length} nomor.${catatanMode()}`);
+}

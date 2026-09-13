@@ -1,7 +1,100 @@
-npm uninstall baileys
+==========================================================
+  CATATAN SINGKAT - RESBOT JPM
+==========================================================
 
-"type": "module",
+MENJALANKAN
+-----------
+  npm start
 
-ubah semua require
+  Login pertama kali: pilih "qr" (scan) atau "pairing" (kode 8 digit).
+  Sesi tersimpan di sessions/whatsapp.sqlite -> tidak perlu login lagi.
+  Mau ganti nomor bot? hapus file itu, lalu npm start lagi.
 
-ubah dirname
+
+BOT TIDAK MEMBALAS? -> TAMBAH NOMOR OWNER
+-----------------------------------------
+  Bot hanya menuruti nomor yang terdaftar sebagai owner.
+  Kalau chat diabaikan, cek terminal. Kalau muncul:
+
+      Nomor 628xxx tidak diizinkan untuk chat ke bot.
+
+  berarti nomor itu belum terdaftar. Cara menambah:
+
+  1. Buka config.js (atau local.config.js kalau ada - yang ini menang)
+  2. Cari baris nomorOwner, lalu tambahkan nomornya:
+
+         nomorOwner: ['6285246154386', '6281234567890'],
+
+     Aturan: pakai kode negara, TANPA tanda + dan TANPA spasi/strip.
+     Salah : '+62 812-3456-7890'
+     Benar : '6281234567890'
+
+  3. Restart bot (Ctrl+C lalu npm start).
+
+  Catatan: kalau nomorOwner masih '628xxxxxxxxxx', saat start akan muncul
+  peringatan merah - memang belum diisi.
+
+
+DAFTAR PERINTAH
+---------------
+  Boleh diawali titik atau pagar (.menu / #menu), boleh juga tanpa awalan.
+
+  menu                          daftar perintah
+  ping                          cek bot masih hidup
+  listgc                        daftar grup + ID + nomor urutnya
+
+  jpm <pesan>                   kirim ke SEMUA grup
+                                (kirim bareng gambar = ikut gambarnya)
+  jpmtag <pesan>                sama seperti jpm, semua anggota ditag
+  autojpm <pesan>               kirim ke semua grup, mengulang terus
+  autojpm stop                  hentikan autojpm
+  autoreply <pesan>             balas otomatis ke grup yang sedang ada chatnya
+                                (dicek tiap 1 menit, grup sepi tidak dikirimi)
+  autoreply stop                hentikan autoreply
+  pushkontak <ID_Grup> <pesan>  japri ke semua anggota satu grup
+                                contoh: pushkontak 12036xxx@g.us Halo
+
+  whitelist                     lihat grup yang DILEWATI jpm/jpmtag/
+                                autojpm/autoreply
+  addwhitelist 1,2,3            tambah whitelist, nomor diambil dari listgc
+  addwhitelist 12036xxx@g.us    bisa juga pakai ID grup langsung
+  delwhitelist 1,2              hapus, nomor diambil dari perintah whitelist
+  delwhitelist all              kosongkan whitelist
+
+  resetdata                     kembalikan bot ke kondisi baru
+  resetdata ya                  konfirmasi (whitelist, link grup, tmp,
+                                autojpm & autoreply dibersihkan)
+                                Sesi login TIDAK dihapus.
+
+
+PENGATURAN PENTING (config.js)
+------------------------------
+  nomorOwner            nomor yang boleh menyuruh bot
+  prefix                awalan perintah, default ['.', '#']
+  jedaKirim             jeda DETIK antar kirim. Jangan terlalu cepat!
+  autojpm.tagSemua      true = autojpm ikut tag semua anggota
+  autojpm.jedaPutaran   jeda DETIK sebelum autojpm mengulang
+  mode                  'production' = kirim sungguhan
+                        'development' = uji coba, TIDAK ada yang dikirim
+                                        (muncul [DEV] TIDAK DIKIRIM di terminal)
+
+  local.config.js       pengaturan pribadi, menimpa config.js, tidak ikut Git.
+                        Enak untuk menyimpan nomor sendiri + mode development.
+
+
+LETAK FILE
+----------
+  data/whitelist.json      grup yang dilewati
+  data/group-links.json    link grup yang terkumpul dari chat
+  sessions/                sesi login WhatsApp
+  tmp/                     gambar sementara
+  plugins/                 1 file = 1 perintah (nama file = nama perintah)
+
+
+TIPS BIAR TIDAK KENA BANNED
+---------------------------
+  - Naikkan jedaKirim kalau grup/kontaknya banyak.
+  - pushkontak paling berisiko (japri ke orang asing) - pakai seperlunya.
+  - Coba dulu dengan mode: 'development' sebelum kirim sungguhan.
+  - Kalau muncul "stream_error_device_removed" artinya perangkat
+    dikeluarkan WhatsApp -> sesi dihapus otomatis, harus login ulang.

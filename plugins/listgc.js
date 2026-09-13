@@ -1,46 +1,32 @@
-async function listgc(sock, sender, message) {
-    try {
-        const groups = await sock.groupFetchAllParticipating();
+import { getSortedGroups } from '../lib/groups.js';
+import { readWhitelist } from '../lib/whitelist.js';
 
-        const groupList = Object.values(groups).map(group => ({
-            id: group.id,
-            name: group.subject,
-            size: group.size,
-            announce: group.announce
-        }));
+export default async function listgc({ client, reply }) {
+  const groups = await getSortedGroups(client);
 
-        const totalGrub = groupList.length;
-        const grubTerbuka = groupList.filter(g => !g.announce).length;
-        const grubTertutup = groupList.filter(g => g.announce).length;
+  if (!groups.length) return reply('Bot belum bergabung ke grup mana pun.');
 
-        groupList.sort((a, b) => b.size - a.size);
+  const terbuka = groups.filter((g) => !g.announce).length;
+  const whitelist = readWhitelist();
 
-        let msg = `
-╭───❰  *GROUP LIST*  ❱
-│ Total     : *${totalGrub}* Grup
-│ Terbuka   : *${grubTerbuka}* Grup
-│ Tertutup  : *${grubTertutup}* Grup
+  const detail = groups
+    .map(
+      (group, i) => `
+◆ *${i + 1}. ${group.name}*
+┇ ID     : ${group.id}
+┇ Anggota: ${group.size}
+┇ Status : ${group.announce ? '🔒 TERTUTUP' : '🟢 TERBUKA'}${
+        whitelist.includes(group.id) ? '\n┇ ⛔ Ada di whitelist (dilewati)' : ''
+      }`,
+    )
+    .join('\n');
+
+  await reply(`╭───❰  *GROUP LIST*  ❱
+│ Total     : *${groups.length}* Grup
+│ Terbuka   : *${terbuka}* Grup
+│ Tertutup  : *${groups.length - terbuka}* Grup
 ╰───────────❱
 
 *Detail Grup:*
-`;
-
-        groupList.forEach((group, index) => {
-            const status = group.announce ? "🔒 TERTUTUP" : "🟢 TERBUKA";
-            msg += `
-◆ *${index + 1}. ${group.name}*
-┇ ID     : ${group.id}
-┇ Anggota: ${group.size}
-┇ Status : ${status}
-`;
-        });
-
-        await sock.sendMessage(sender, { text: msg });
-
-    } catch (error) {
-        console.error('Gagal mendapatkan daftar grup:', error);
-        await sock.sendMessage(sender, { text: '❌ Gagal mengambil daftar grup, coba lagi nanti.' });
-    }
+${detail}`);
 }
-
-export default listgc;
