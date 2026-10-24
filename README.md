@@ -7,6 +7,11 @@ Dibuat dengan JavaScript di atas library [zapo-js](https://zapo.to).
 
 Butuh **Node.js 20.9+** (disarankan 22).
 
+Tidak perlu build apa pun (tanpa python / make / g++). Sesi disimpan dengan
+`node:sqlite` bawaan Node 22.13+, atau `node-sqlite3-wasm` di Node 20, jadi
+`npm install` tidak lagi gagal karena `better-sqlite3`. File `.npmrc` sengaja
+ada supaya npm tidak memasang `better-sqlite3` secara otomatis — jangan dihapus.
+
 ```bash
 git clone https://github.com/autoresbot/resbot-jpm.git
 cd resbot-jpm
@@ -34,6 +39,12 @@ Semua ada di **`config.js`** — hanya file ini yang perlu Anda ubah:
 | `autojpm.tagSemua` | `true` = tag semua anggota grup saat autojpm |
 | `autojpm.jedaPutaran` | Jeda **detik** sebelum autojpm mengulang |
 | `mode` | `'production'` = kirim sungguhan, `'development'` = uji coba |
+
+Urutan kirim `jpm` / `jpmtag` / `autojpm`: **grup WhatsApp biasa dulu**, grup
+di dalam komunitas menyusul. Grup yang pasti ditolak WhatsApp (`error=420`)
+dilewati otomatis: induk komunitas, grup pengumuman komunitas, dan grup
+"hanya admin yang boleh kirim" — kecuali bot adalah admin di grup itu.
+Perintah `listgc` menandai grup mana saja yang dilewati.
 
 Grup yang tidak ingin dikirimi pesan diatur lewat perintah `whitelist` /
 `addwhitelist` / `delwhitelist` (tersimpan di `data/whitelist.json`).

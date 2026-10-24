@@ -24,7 +24,7 @@ const config = {
 
   // 3) Identitas bot (muncul di menu & ping)
   namaBot: 'Script Resbot Jpm',
-  versi: '2.3.0',
+  versi: '2.4.0',
 
   // 4) Jeda dalam DETIK antar pengiriman ke tiap grup / kontak.
   //    Makin besar makin aman dari banned. Jangan di bawah 5.
