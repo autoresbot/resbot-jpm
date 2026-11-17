@@ -24,7 +24,7 @@ const config = {
 
   // 3) Identitas bot (muncul di menu & ping)
   namaBot: 'Script Resbot Jpm',
-  versi: '2.4.0',
+  versi: '2.4.1',
 
   // 4) Jeda dalam DETIK antar pengiriman ke tiap grup / kontak.
   //    Makin besar makin aman dari banned. Jangan di bawah 5.
@@ -67,6 +67,12 @@ const config = {
     metode: '',
     nomor: '',
   },
+
+  // 9) UPDATE OTOMATIS LIBRARY zapo-js
+  //    Setiap bot dinyalakan, versi zapo-js dicek ke npm.
+  //    true  = kalau ada versi baru, langsung diupdate otomatis
+  //    false = hanya diberi tahu di terminal, tidak diupdate
+  autoUpdateZapo: true,
 };
 
 /*

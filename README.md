@@ -39,6 +39,7 @@ Semua ada di **`config.js`** — hanya file ini yang perlu Anda ubah:
 | `autojpm.tagSemua` | `true` = tag semua anggota grup saat autojpm |
 | `autojpm.jedaPutaran` | Jeda **detik** sebelum autojpm mengulang |
 | `mode` | `'production'` = kirim sungguhan, `'development'` = uji coba |
+| `autoUpdateZapo` | `true` = saat start, zapo-js otomatis diupdate ke versi terbaru; `false` = hanya diberi tahu |
 
 Urutan kirim `jpm` / `jpmtag` / `autojpm`: **grup WhatsApp biasa dulu**, grup
 di dalam komunitas menyusul. Grup yang pasti ditolak WhatsApp (`error=420`)

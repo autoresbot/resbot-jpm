@@ -5,7 +5,7 @@ Script ini **TIDAK BOLEH DIPERJUALBELIKAN** dalam bentuk apa pun!
 ╔══════════════════════════════════════════════╗
 ║                🛠️ INFORMASI SCRIPT           ║
 ╠══════════════════════════════════════════════╣
-║ 📦 Version   : 2.4.0
+║ 📦 Version   : 2.4.1
 ║ 👨‍💻 Developer  : Azhari Creative              ║
 ║ 🌐 Website    : https://autoresbot.com       ║
 ║ 💻 GitHub     : github.com/autoresbot/resbot-jpm
@@ -20,10 +20,9 @@ Semua pengaturan ada di file config.js
 
 import config from './config.js';
 import { log } from './lib/logger.js';
-import { startBot } from './lib/whatsapp.js';
-import { resumeAutoJPM } from './lib/autojpm.js';
 import { modeUjiCoba } from './lib/mode.js';
 import { migrateOldFolders } from './lib/paths.js';
+import { cekUpdateZapo } from './lib/updater.js';
 
 console.log(`Start App .. ${config.namaBot} v${config.versi}`);
 
@@ -47,6 +46,13 @@ if (nomorSalah.length) {
   log('Selama belum diganti, bot tidak akan menuruti perintah siapa pun.', 'yellow');
   log('=========================================================', 'red');
 }
+
+// Cek/update zapo-js dulu. File yang memakai zapo-js baru di-import SETELAH ini,
+// supaya versi hasil update langsung terpakai tanpa perlu restart.
+await cekUpdateZapo({ autoUpdate: config.autoUpdateZapo !== false });
+
+const { startBot } = await import('./lib/whatsapp.js');
+const { resumeAutoJPM } = await import('./lib/autojpm.js');
 
 startBot((client) => {
   // Dijalankan setiap koneksi berhasil terbuka
